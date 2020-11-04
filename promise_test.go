@@ -126,6 +126,7 @@ func TestPromise_Then_After_Catch(t *testing.T) {
 	}, func(err error) interface{} {
 		return err
 	})
+	promise.wg.Wait()
 }
 
 func TestPromise_Catch_After_Then(t *testing.T) {
@@ -182,4 +183,21 @@ func TestPromise_Finally(t *testing.T) {
 
 	finalPromise.wg.Wait()
 
+}
+
+func TestPromise_onPanic(t *testing.T) {
+	var promise = Create(
+		func(reject Reject, resolve Resolve) {
+			time.Sleep(2 * time.Second)
+			panic(errors.New("panic"))
+		})
+	promise.Then(func(value interface{}) interface{} {
+		return value
+	}, func(err error) interface{} {
+		if err.Error() != "panic" {
+			t.Error("panic not handled")
+		}
+		return err
+	})
+	promise.wg.Wait()
 }

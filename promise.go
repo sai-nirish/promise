@@ -87,7 +87,7 @@ func (promise *Promise) resolvePanic() {
 	if err != nil {
 		switch e := err.(type) {
 		case error:
-			promise.reject(fmt.Errorf("panic recovery with error: %s", e.Error()))
+			promise.reject(e)
 		default:
 			promise.reject(fmt.Errorf("panic recovery with unknown error: %s", fmt.Sprint(e)))
 		}
