@@ -1,0 +1,1 @@
+Promise implementation in Golang
