@@ -1,6 +1,7 @@
 package promise
 
 import (
+	"fmt"
 	"sync"
 )
 
@@ -40,7 +41,11 @@ func Create(executor Executor) *Promise {
 
 	promise.wg.Add(1)
 
-	go executor(promise.reject, promise.resolve)
+	go func() {
+		defer promise.resolvePanic()
+		executor(promise.reject, promise.resolve)
+	}()
+
 	return promise
 }
 
@@ -75,6 +80,18 @@ func (promise *Promise) reject(err error) {
 	}
 	promise.wg.Done()
 	promise.mutex.Unlock()
+}
+
+func (promise *Promise) resolvePanic() {
+	err := recover()
+	if err != nil {
+		switch e := err.(type) {
+		case error:
+			promise.reject(fmt.Errorf("panic recovery with error: %s", e.Error()))
+		default:
+			promise.reject(fmt.Errorf("panic recovery with unknown error: %s", fmt.Sprint(e)))
+		}
+	}
 }
 
 //Then ...
