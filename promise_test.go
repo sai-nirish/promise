@@ -2,7 +2,6 @@ package promise
 
 import (
 	"errors"
-	"fmt"
 	"testing"
 	"time"
 )
@@ -168,7 +167,6 @@ func TestPromise_Finally(t *testing.T) {
 		return err
 	}).Finally(
 		func() interface{} {
-			fmt.Println("Finally called")
 			return nil
 		})
 
